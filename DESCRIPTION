@@ -1,0 +1,9 @@
+Package: beavR
+Title: A Collection of Personal Functions I've accumulated
+Version: 0.1
+Authors@R: "Zachary Beaver <zbeaver4@gmail.com> [aut, cre]"
+Description: This package does...lots of stuff
+Depends:
+    R (>= 3.1.1)
+License: None
+LazyData: true
