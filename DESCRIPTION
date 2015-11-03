@@ -1,9 +1,8 @@
 Package: beavR
-Title: A Collection of Personal Functions I've accumulated
-Version: 0.1
-Authors@R: "Zachary Beaver <zbeaver4@gmail.com> [aut, cre]"
-Description: This package does...lots of stuff
-Depends:
-    R (>= 3.1.1)
+Title: Useful and Reusable R Functions from Past Projects
+Version: 0.0.0.9000
+Authors@R: person("Zachary", "Beaver", email = "zbeaver3@gmail.com", role = c("aut", "cre"))
+Description: Useful functions that I don't want to re-write for future projects
+Depends: R (>= 3.2.0)
 License: None
 LazyData: true

@@ -1,10 +1,9 @@
 #' Add nodes to neo4j from a dataframe
 #'
-#' This function adds nodes row-wise to a neo4j graph (called "graph")
+#' This function adds nodes row-wise to a neo4j graph (called "graph"). Requires RNeo4j.
 #' 
 #' @usage add_nodes(df, label, id, props = NULL, verbose = FALSE, na.act = F)
-#' @param
-#' df: dataframe which will be traversed to row-wise to add nodes.
+#' @param df: dataframe which will be traversed to row-wise to add nodes.
 #' @param label: The label to assign to each node (takes a character value)
 #' @param id: column name in dataframe required for a node to be created (takes a character value)
 #' @param props: column names(s) in dataframe of node properties (takes a character vector); defaults to NULL
@@ -15,6 +14,7 @@
 #' add_nodes(awarded_contracts, "contract", "DUNSNumber", props = names(awarded_contracts), verbose = T)
 
 add_nodes <- function(df, label, id, props = NULL, verbose = FALSE, na.act = F) {
+  
   nodes <- list()
   # cannot have name of NA value
   miss <- !is.na(df[, id])
