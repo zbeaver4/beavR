@@ -143,3 +143,102 @@ get_table_lengths <- function(conn, table_names){
   table_df
   
 }
+
+#' Get all table, column, and view metadata from SQL Server database
+#'
+#' Given an odbc handle this function gras all the metadata associated with a database at the table/column level and returns it as a data.frame
+#' 
+#' @usage get_all_table_info(conn, table_names)
+#' @param conn: odbc handle
+#' @keywords database exploration
+#' @examples 
+#' get_all_table_info(conn)
+get_all_table_info <- function(conn){
+  require(ODBC, quietly = T)
+  sqlQuery(conn, "SELECT a .[name] as 'Table' ,
+           b.[name] as 'Column',      
+           c.[name] as 'Datatype',
+           
+           b.[length] as 'Length',
+           
+           CASE
+           
+           WHEN b .[cdefault] > 0 THEN d. [text]
+           
+           ELSE NULL
+           
+           END as 'Default',
+           
+           CASE
+           
+           WHEN b .[isnullable] = 0 THEN 'No'
+           
+           ELSE 'Yes'
+           
+           END as 'Nullable'
+           
+           FROM sysobjects a
+           
+           INNER JOIN syscolumns b
+           
+           ON a .[id] = b .[id]
+           
+           INNER JOIN systypes c
+           
+           ON b .[xtype] = c .[xtype]
+           
+           LEFT JOIN syscomments d
+           
+           ON b .[cdefault] = d .[id]
+           
+           WHERE a .[xtype] = 'u'
+           
+           -- 'u' for user tables, 'v' for views.
+           
+           --and a.[name]='table name'
+           
+           AND a .[name] <> 'dtproperties'
+           
+           ORDER BY a. [name],b .[colorder]")
+}
+
+#' Perform left outer join of data.tables with diagnostics
+#'  
+#'  Given two data.tables, this function performs a left outer join and reports on any cartesian product, what percentage matched up, etc.
+#' 
+#' @usage dt_left_outer(dt1, dt2, key1, key2 = key1, dt2_subset_cols = NULL, cartesian = T)
+#' @param dt1: First data.table (the one "on the left")
+#' @param dt2: Second data.table (the one "on the right")
+#' @param key1: The column (character) from dt1 on which the join is being performed
+#' @param key2: The column (character) from dt2 on which the join is being performed
+#' @param dt2_subset_cols: Character vector of the columns to keep in dt2 after the join is performed
+#' @keywords database exploration
+#' @examples 
+#' first_dt <- data.table (a = 1:5, b = c('a', 'b', 'c', 'd', 'e'))
+#' second_dt <- data.table (a = 3:7, c = c('yes', 'no', 'no', 'yes', 'yes'))
+#' dt_left_outer (first_dt, second_dt, 'a')
+dt_left_outer <- function(dt1, dt2, key1, key2 = key1, dt2_subset_cols = NULL, cartesian = T){
+  
+  require(data.table, quietly = T)
+  
+  #Set the key
+  setkeyv(dt1, key1)
+  setkeyv(dt2, key2)
+  
+  #Check to see if the second data.table should be subset
+  if(!is.null(dt2_subset_cols)) dt2 <- dt2[, dt2_subset_cols, with = F]
+  
+  #Join the two data.tables
+  new_dt <- dt2[dt1, allow.cartesian = cartesian]
+  
+  #Report on the matching rows and any duplication of rows that resulted from the join
+  if (nrow(new_dt) != nrow(dt1)) print(paste("Number of resulting rows exceeded those in original data.table by ",
+                                             nrow(new_dt) - nrow(dt1), " (",
+                                             round((nrow(new_dt) - nrow(dt1)) / nrow(dt1) * 100, 3), "%)", sep = ""))
+  
+  matches <- sum(dt1[, get(key1)] %in% unique(dt2[, get(key2)]))
+  print(paste(matches, " IDs (", round(matches / nrow(dt1), 3) * 100, "%) in the original data.table have matches in the second data.table"), sep = '')
+  
+  return(new_dt)
+  
+}
