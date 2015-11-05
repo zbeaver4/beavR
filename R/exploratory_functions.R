@@ -242,3 +242,36 @@ dt_left_outer <- function(dt1, dt2, key1, key2 = key1, dt2_subset_cols = NULL, c
   return(new_dt)
   
 }
+
+#' Trim leading whitespace
+#'
+#' Given a character vector, trims all leading whitespace from each component of the vector
+#' 
+#' @usage trim.leading(x)
+#' @param x: character vector
+#' @keywords strings
+#' @examples 
+#' trim.leading(c('  hello', 'no'))
+trim.leading <- function (x)  sub("^\\s+", "", x)
+
+#' Trim trailing whitespace
+#'
+#' Given a character vector, trims all trailing whitespace from each component of the vector
+#' 
+#' @usage trim.trailing(x)
+#' @param x: character vector
+#' @keywords strings
+#' @examples 
+#' trim.trailing(c('hello  ', 'no'))
+trim.trailing <- function (x) sub("\\s+$", "", x)
+
+#' Trim trailing whitespace
+#'
+#' Given a character vector, trims all leading and trailing whitespace from each component of the vector
+#' 
+#' @usage trim(x)
+#' @param x: character vector
+#' @keywords strings
+#' @examples 
+#' trim(c('hello  ', '  no'))
+trim <- function (x) gsub("^\\s+|\\s+$", "", x)
